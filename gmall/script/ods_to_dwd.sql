@@ -1,5 +1,5 @@
 --商品维度表逻辑
-insert overwrite table dwd_dim_sku_info partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_dim_sku_info partition(dt='$dt')
 select
 sku.id,
 sku.spu_id,
@@ -19,30 +19,30 @@ spu.spu_name,
 sku.create_time
 from
 (
-select * from ods_sku_info where dt='2020-03-10'
+select * from ods_sku_info where dt='$dt'
 )sku
 join
 (
-select * from ods_base_trademark where dt='2020-03-10'
+select * from ods_base_trademark where dt='$dt'
 )ob on sku.tm_id=ob.tm_id
 join
 (
-select * from ods_spu_info where dt='2020-03-10'
+select * from ods_spu_info where dt='$dt'
 )spu on spu.id = sku.spu_id
 join
 (
-select * from ods_base_category3 where dt='2020-03-10'
+select * from ods_base_category3 where dt='$dt'
 )c3 on sku.category3_id=c3.id
 join
 (
-select * from ods_base_category2 where dt='2020-03-10'
+select * from ods_base_category2 where dt='$dt'
 )c2 on c3.category2_id=c2.id
 join
 (
-select * from ods_base_category1 where dt='2020-03-10'
+select * from ods_base_category1 where dt='$dt'
 )c1 on c2.category1_id=c1.id;
 
-insert overwrite table dwd_dim_coupon_info partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_dim_coupon_info partition(dt='$dt')
 select
 id,
 coupon_name,
@@ -61,9 +61,9 @@ limit_num,
 operate_time,
 expire_time
 from ods_coupon_info
-where dt='2020-03-10';
+where dt='$dt';
 
-insert overwrite table dwd_dim_activity_info partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_dim_activity_info partition(dt='$dt')
 select
 info.id,
 info.activity_name,
@@ -78,14 +78,14 @@ info.end_time,
 info.create_time
 from
 (
-select * from ods_activity_info where dt='2020-03-10'
+select * from ods_activity_info where dt='$dt'
 )info
 left join
 (
-select * from ods_activity_rule where dt='2020-03-10'
+select * from ods_activity_rule where dt='$dt'
 )rule on info.id = rule.activity_id;
 
-insert overwrite table dwd_dim_base_province
+insert overwrite table gmall.dwd_dim_base_province
 select
 bp.id,
 bp.name,
@@ -97,7 +97,7 @@ from ods_base_province bp
 join ods_base_region br
 on bp.region_id=br.id;
 
-insert overwrite table dwd_fact_order_detail partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_fact_order_detail partition(dt='$dt')
 select
 od.id,
 od.order_id,
@@ -111,15 +111,15 @@ oi.province_id,
 od.order_price*od.sku_num
 from
 (
-select * from ods_order_detail where dt='2020-03-10'
+select * from ods_order_detail where dt='$dt'
 ) od
 join
 (
-select * from ods_order_info where dt='2020-03-10'
+select * from ods_order_info where dt='$dt'
 ) oi
 on od.order_id=oi.id;
 
-insert overwrite table dwd_fact_payment_info partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_fact_payment_info partition(dt='$dt')
 select
 pi.id,
 pi.out_trade_no,
@@ -133,16 +133,16 @@ pi.payment_time,
 oi.province_id
 from
 (
-select * from ods_payment_info where dt='2020-03-10'
+select * from ods_payment_info where dt='$dt'
 )pi
 join
 (
-select id, province_id from ods_order_info where dt='2020-03-10'
+select id, province_id from ods_order_info where dt='$dt'
 )oi
 on pi.order_id = oi.id;
 
 
-insert overwrite table dwd_fact_order_refund_info partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_fact_order_refund_info partition(dt='$dt')
 select
 id,
 user_id,
@@ -154,9 +154,9 @@ refund_amount,
 refund_reason_type,
 create_time
 from ods_order_refund_info
-where dt='2020-03-10';
+where dt='$dt';
 
-insert overwrite table dwd_fact_comment_info partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_fact_comment_info partition(dt='$dt')
 select
 id,
 user_id,
@@ -166,9 +166,9 @@ order_id,
 appraise,
 create_time
 from ods_comment_info
-where dt='2020-03-10';
+where dt='$dt';
 
-insert overwrite table dwd_fact_cart_info partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_fact_cart_info partition(dt='$dt')
 select
 id,
 user_id,
@@ -181,9 +181,9 @@ operate_time,
 is_ordered,
 order_time
 from ods_cart_info
-where dt='2020-03-10';
+where dt='$dt';
 
-insert overwrite table dwd_fact_favor_info partition(dt='2020-03-10')
+insert overwrite table gmall.dwd_fact_favor_info partition(dt='$dt')
 select
 id,
 user_id,
@@ -193,10 +193,10 @@ is_cancel,
 create_time,
 cancel_time
 from ods_favor_info
-where dt='2020-03-10';
+where dt='$dt';
 
 
-insert overwrite table dwd_fact_coupon_use partition(dt)
+insert overwrite table gmall.dwd_fact_coupon_use partition(dt)
 select
 if(new.id is null,old.id,new.id),
 if(new.coupon_id is null,old.coupon_id,new.coupon_id),
@@ -218,13 +218,13 @@ coupon_status,
 get_time,
 using_time,
 used_time
-from dwd_fact_coupon_use
+from gmall.dwd_fact_coupon_use
 where dt in
 (
 select
 date_format(get_time,'yyyy-MM-dd')
 from ods_coupon_use
-where dt='2020-03-10'
+where dt='$dt'
 )
 )old
 full outer join
@@ -239,12 +239,12 @@ get_time,
 using_time,
 used_time
 from ods_coupon_use
-where dt='2020-03-10'
+where dt='$dt'
 )new
 on old.id=new.id;
 
 set hive.exec.dynamic.partition.mode=nonstrict;
-insert overwrite table dwd_fact_order_info partition(dt)
+insert overwrite table gmall.dwd_fact_order_info partition(dt)
 select
 if(new.id is null,old.id,new.id),
 if(new.order_status is null,old.order_status,new.order_status),
@@ -285,14 +285,14 @@ original_total_amount,
 benefit_reduce_amount,
 feight_fee,
 final_total_amount
-from dwd_fact_order_info
+from gmall.dwd_fact_order_info
 where dt
 in
 (
 select
 date_format(create_time,'yyyy-MM-dd')
 from ods_order_info
-where dt='2020-03-10'
+where dt='$dt'
 )
 )old
 full outer join
@@ -316,23 +316,43 @@ order_id,
 str_to_map(concat_ws(',',collect_set(concat(order_status,'=',operate_time))),',','=')
 tms
 from ods_order_status_log
-where dt='2020-03-10'
+where dt='$dt'
 group by order_id
 )log
 join
 (
-select * from ods_order_info where dt='2020-03-10'
+select * from ods_order_info where dt='$dt'
 )info
 on log.order_id=info.id
 left join
 (
-select * from ods_activity_order where dt='2020-03-10'
+select * from ods_activity_order where dt='$dt'
 )act
 on log.order_id=act.order_id
 )new
 on old.id=new.id;
 
-insert overwrite table dwd_dim_user_info_his
+
+
+--insert overwrite table gmall.dwd_dim_user_info_his
+--select
+--id,
+--name,
+--birthday,
+--gender,
+--email,
+--user_level,
+--create_time,
+--operate_time,
+--'$dt',
+--'9999-99-99'
+--from ods_user_info oi
+--where oi.dt='$dt';
+
+
+insert overwrite table gmall.dwd_dim_user_info_his_tmp
+select * from
+(
 select
 id,
 name,
@@ -342,7 +362,31 @@ email,
 user_level,
 create_time,
 operate_time,
-'2020-03-10',
-'9999-99-99'
-from ods_user_info oi
-where oi.dt='2020-03-10';
+'$dt' start_date,
+'9999-99-99' end_date
+from ods_user_info where dt='$dt'
+union all
+select
+uh.id,
+uh.name,
+uh.birthday,
+uh.gender,
+uh.email,
+uh.user_level,
+uh.create_time,
+uh.operate_time,
+uh.start_date,
+if(ui.id is not null and uh.end_date='9999-99-99', date_add(ui.dt,-1),
+uh.end_date) end_date
+from gmall.dwd_dim_user_info_his uh left join
+(
+select
+*
+from ods_user_info
+where dt='$dt'
+) ui on uh.id=ui.id
+)his
+order by his.id, start_date;
+
+insert overwrite table gmall.dwd_dim_user_info_his
+select * from gmall.dwd_dim_user_info_his_tmp;
