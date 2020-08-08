@@ -2,10 +2,10 @@
 APP=gmall
 hive=/u01/hive/apache-hive-2.3.3-bin/bin/hive
 # 如果是输入的日期按照取输入日期；如果没输入日期取当前时间的前一天
-if [ -n $1 ] ;then
-  do_date=`date -d "-1 day" +%F`
-else
+if [ -n "$1" ] ;then
   do_date=$1
+else
+  do_date=`date -d "-1 day" +%F`
 fi
 
 sql1="

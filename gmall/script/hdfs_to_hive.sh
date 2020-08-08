@@ -2,9 +2,9 @@
 
 hive=/u01/hive/apache-hive-2.3.3-bin/bin/hive
 if [ -n $1 ] ;then
- dt_now=`date -d "-1 day" +%F`
-else
  dt_now=$1
+else
+ dt_now=`date -d "-1 day" +%F`
 fi
 
 cp /u01/warehouse/conf/hdfs_to_hive.cnf /u01/warehouse/hdfs_to_hive.cnf

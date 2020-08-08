@@ -3,9 +3,9 @@
 warehouse=/u01/warehouse
 log=/u01/warehouse/log/
 if [ -n $1 ] ;then
-   dt=`date -d "-1 day" +%F`
+   dt=$1   
 else
-   dt=$1
+   dt=`date -d "-1 day" +%F`
 fi
 
 cp /u01/warehouse/conf/mysql_to_hdfs.cnf /u01/warehouse/mysql_to_hdfs.cnf
